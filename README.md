@@ -15,5 +15,5 @@ Step 1. Add below codes in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	        compile 'com.github.richfuns:FDropDownMenu:v1.0.0'
+	        compile 'com.github.richfuns:FDropDownMenu:v1.0.1'
 	}
