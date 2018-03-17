@@ -232,8 +232,6 @@ public class FxDropDownMenu extends LinearLayout {
      * @param target
      */
     private void switchMenu(View target) {
-        System.out.println(currentTabPosition);
-        Log.e(TAG, "switchMenu: childCount: "+ tabMenuView.getChildCount());
         for (int i = 0; i < tabMenuView.getChildCount(); i = i + 2) {
             if (target == tabMenuView.getChildAt(i)) {
                 if (currentTabPosition == i) {
