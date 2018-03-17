@@ -1,4 +1,4 @@
-package in.iteye.fdropdownmenu;
+package in.iteye.fxframework;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

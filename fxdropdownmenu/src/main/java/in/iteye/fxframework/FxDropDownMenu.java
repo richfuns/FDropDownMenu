@@ -1,4 +1,4 @@
-package in.iteye.fdropdownmenu;
+package in.iteye.fxframework;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -25,7 +26,9 @@ import java.util.List;
  * 描    述：下拉菜单组件View
  * =========================================
  */
-public class FDropDownMenu extends LinearLayout {
+public class FxDropDownMenu extends LinearLayout {
+
+    private static final String TAG = "FxDropDownMenu";
 
     //顶部菜单布局
     private LinearLayout tabMenuView;
@@ -36,7 +39,7 @@ public class FDropDownMenu extends LinearLayout {
     //遮罩半透明View，点击可关闭DropDownMenu
     private View maskView;
     //tabMenuView里面选中的tab位置，-1表示未选中
-    private int current_tab_position = -1;
+    private int currentTabPosition = -1;
 
     //分割线颜色
     private int dividerColor = 0xffcccccc;
@@ -55,36 +58,35 @@ public class FDropDownMenu extends LinearLayout {
     private int menuUnselectedIcon;
 
     //显示的Menu View内容高度,这里是屏幕高度的一半
-    private float menuHeighPercent = 0.5f;
+    private float menuHeightRatio = 0.5f;
 
-    public FDropDownMenu(Context context) {
+    public FxDropDownMenu(Context context) {
         super(context, null);
     }
 
-    public FDropDownMenu(Context context, AttributeSet attrs) {
+    public FxDropDownMenu(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FDropDownMenu(Context context, AttributeSet attrs, int defStyleAttr) {
+    public FxDropDownMenu(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         setOrientation(VERTICAL);
 
-        //为DropDownMenu添加自定义属性
-        int menuBackgroundColor = 0xffffffff;//正式
-//        int menuBackgroundColor = 0xff7B1FA2;//测试用
+        int menuBackgroundColor = 0xffffffff;
         int underlineColor = 0xffcccccc;
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FDropDownMenu);
-        underlineColor = a.getColor(R.styleable.FDropDownMenu_ddunderlineColor, underlineColor);
-        dividerColor = a.getColor(R.styleable.FDropDownMenu_dddividerColor, dividerColor);
-        textSelectedColor = a.getColor(R.styleable.FDropDownMenu_ddtextSelectedColor, textSelectedColor);
-        textUnselectedColor = a.getColor(R.styleable.FDropDownMenu_ddtextUnselectedColor, textUnselectedColor);
-        menuBackgroundColor = a.getColor(R.styleable.FDropDownMenu_ddmenuBackgroundColor, menuBackgroundColor);
-        maskColor = a.getColor(R.styleable.FDropDownMenu_ddmaskColor, maskColor);
-        menuTextSize = a.getDimensionPixelSize(R.styleable.FDropDownMenu_ddmenuTextSize, menuTextSize);
-        menuSelectedIcon = a.getResourceId(R.styleable.FDropDownMenu_ddmenuSelectedIcon, menuSelectedIcon);
-        menuUnselectedIcon = a.getResourceId(R.styleable.FDropDownMenu_ddmenuUnselectedIcon, menuUnselectedIcon);
-        menuHeighPercent = a.getFloat(R.styleable.FDropDownMenu_ddmenuMenuHeightPercent,menuHeighPercent);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FxDropDownMenu);
+        underlineColor = a.getColor(R.styleable.FxDropDownMenu_ddunderlineColor, underlineColor);
+        dividerColor = a.getColor(R.styleable.FxDropDownMenu_dddividerColor, dividerColor);
+        textSelectedColor = a.getColor(R.styleable.FxDropDownMenu_ddtextSelectedColor, textSelectedColor);
+        textUnselectedColor = a.getColor(R.styleable.FxDropDownMenu_ddtextUnselectedColor, textUnselectedColor);
+        menuBackgroundColor = a.getColor(R.styleable.FxDropDownMenu_ddmenuBackgroundColor, menuBackgroundColor);
+        maskColor = a.getColor(R.styleable.FxDropDownMenu_ddmaskColor, maskColor);
+        menuTextSize = a.getDimensionPixelSize(R.styleable.FxDropDownMenu_ddmenuTextSize, menuTextSize);
+        menuSelectedIcon = a.getResourceId(R.styleable.FxDropDownMenu_ddmenuSelectedIcon, menuSelectedIcon);
+        menuUnselectedIcon = a.getResourceId(R.styleable.FxDropDownMenu_ddmenuUnselectedIcon, menuUnselectedIcon);
+        menuHeightRatio = a.getFloat(R.styleable.FxDropDownMenu_ddmenuMenuHeightPercent, menuHeightRatio);
         a.recycle();
 
         //初始化tabMenuView并添加到tabMenuView
@@ -144,7 +146,7 @@ public class FDropDownMenu extends LinearLayout {
 
         //弹出的菜单View
         popupMenuViews = new FrameLayout(getContext());
-        popupMenuViews.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (DeviceUtils.getScreenSize(getContext()).y*menuHeighPercent)));
+        popupMenuViews.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (DeviceUtils.getScreenSize(getContext()).y* menuHeightRatio)));
         popupMenuViews.setVisibility(GONE);
         containerView.addView(popupMenuViews, 2);
 
@@ -165,7 +167,6 @@ public class FDropDownMenu extends LinearLayout {
         tab.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(menuUnselectedIcon), null);
         tab.setText(tabTexts.get(i));
         tab.setPadding(dpTpPx(5), dpTpPx(12), dpTpPx(5), dpTpPx(12));
-        //添加点击事件
         tab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,6 +174,7 @@ public class FDropDownMenu extends LinearLayout {
             }
         });
         tabMenuView.addView(tab);
+
         //添加菜单中间的垂直分割线
         if (i < tabTexts.size() - 1) {
             View view = new View(getContext());
@@ -188,8 +190,8 @@ public class FDropDownMenu extends LinearLayout {
      * @param text
      */
     public void setTabText(String text) {
-        if (current_tab_position != -1) {
-            ((TextView) tabMenuView.getChildAt(current_tab_position)).setText(text);
+        if (currentTabPosition != -1) {
+            ((TextView) tabMenuView.getChildAt(currentTabPosition)).setText(text);
         }
     }
 
@@ -203,17 +205,16 @@ public class FDropDownMenu extends LinearLayout {
      * 关闭菜单
      */
     public void closeMenu() {
-        if (current_tab_position != -1) {
-            ((TextView) tabMenuView.getChildAt(current_tab_position)).setTextColor(textUnselectedColor);
-            ((TextView) tabMenuView.getChildAt(current_tab_position)).setCompoundDrawablesWithIntrinsicBounds(null, null,
+        if (currentTabPosition != -1) {
+            ((TextView) tabMenuView.getChildAt(currentTabPosition)).setTextColor(textUnselectedColor);
+            ((TextView) tabMenuView.getChildAt(currentTabPosition)).setCompoundDrawablesWithIntrinsicBounds(null, null,
                     getResources().getDrawable(menuUnselectedIcon), null);
             popupMenuViews.setVisibility(View.GONE);
             popupMenuViews.setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dd_menu_out));
             maskView.setVisibility(GONE);
             maskView.setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dd_mask_out));
-            current_tab_position = -1;
+            currentTabPosition = -1;
         }
-
     }
 
     /**
@@ -222,7 +223,7 @@ public class FDropDownMenu extends LinearLayout {
      * @return
      */
     public boolean isShowing() {
-        return current_tab_position != -1;
+        return currentTabPosition != -1;
     }
 
     /**
@@ -231,13 +232,14 @@ public class FDropDownMenu extends LinearLayout {
      * @param target
      */
     private void switchMenu(View target) {
-        System.out.println(current_tab_position);
+        System.out.println(currentTabPosition);
+        Log.e(TAG, "switchMenu: childCount: "+ tabMenuView.getChildCount());
         for (int i = 0; i < tabMenuView.getChildCount(); i = i + 2) {
             if (target == tabMenuView.getChildAt(i)) {
-                if (current_tab_position == i) {
+                if (currentTabPosition == i) {
                     closeMenu();
                 } else {
-                    if (current_tab_position == -1) {
+                    if (currentTabPosition == -1) {
                         popupMenuViews.setVisibility(View.VISIBLE);
                         popupMenuViews.setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dd_menu_in));
                         maskView.setVisibility(VISIBLE);
@@ -246,7 +248,7 @@ public class FDropDownMenu extends LinearLayout {
                     } else {
                         popupMenuViews.getChildAt(i / 2).setVisibility(View.VISIBLE);
                     }
-                    current_tab_position = i;
+                    currentTabPosition = i;
                     ((TextView) tabMenuView.getChildAt(i)).setTextColor(textSelectedColor);
                     ((TextView) tabMenuView.getChildAt(i)).setCompoundDrawablesWithIntrinsicBounds(null, null,
                             getResources().getDrawable(menuSelectedIcon), null);

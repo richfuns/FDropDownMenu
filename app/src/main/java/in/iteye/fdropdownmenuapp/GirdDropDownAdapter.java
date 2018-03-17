@@ -18,6 +18,10 @@ public class GirdDropDownAdapter extends BaseAdapter {
     private List<String> list;
     private int checkItemPosition = 0;
 
+    /**
+     * 设置选中项
+     * @param position
+     */
     public void setCheckItem(int position) {
         checkItemPosition = position;
         notifyDataSetChanged();

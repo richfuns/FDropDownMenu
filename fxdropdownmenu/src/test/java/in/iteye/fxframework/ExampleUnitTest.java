@@ -1,4 +1,4 @@
-package in.iteye.fdropdownmenu;
+package in.iteye.fxframework;
 
 import org.junit.Test;
 

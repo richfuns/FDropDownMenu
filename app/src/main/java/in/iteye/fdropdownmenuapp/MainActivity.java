@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import in.iteye.fdropdownmenu.FDropDownMenu;
+import in.iteye.fxframework.FxDropDownMenu;
 
 public class MainActivity extends AppCompatActivity {
 
-    FDropDownMenu mDropDownMenu;
+    FxDropDownMenu mDropDownMenu;
     private String headers[] = {"城市", "年龄", "性别", "星座"};
     private List<View> popupViews = new ArrayList<>();
 
@@ -130,5 +130,14 @@ public class MainActivity extends AppCompatActivity {
 
         //init dropdownview
         mDropDownMenu.setDropDownMenu(Arrays.asList(headers), popupViews, recyclerLayout);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mDropDownMenu.isShowing()){
+            mDropDownMenu.closeMenu();
+        }else{
+            super.onBackPressed();
+        }
     }
 }

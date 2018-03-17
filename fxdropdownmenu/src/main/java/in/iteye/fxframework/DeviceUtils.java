@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package in.iteye.fdropdownmenu;
+package in.iteye.fxframework;
 
 import android.annotation.TargetApi;
 import android.content.Context;

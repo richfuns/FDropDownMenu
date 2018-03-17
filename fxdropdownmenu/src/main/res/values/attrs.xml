@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="FDropDownMenu">
+    <declare-styleable name="FxDropDownMenu">
         <attr name="ddunderlineColor" format="color"/>
         <attr name="dddividerColor" format="color"/>
         <attr name="ddtextSelectedColor" format="color"/>
